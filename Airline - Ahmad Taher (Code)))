@@ -1,0 +1,735 @@
+from enum import Enum
+import datetime
+
+#Here we define some of the ENUMs we will be using.
+#We will be using some example to simulate real-life.
+class Position (Enum):
+    IT = 1
+    Secuirty_Guard = 2
+
+class SeatClass (Enum):
+    Economy = 1
+    Business = 2
+
+class Location (Enum):
+    Dubai = 1
+    Baku = 2
+    New_York = 3
+
+# We will start with defining Person, because it a simple parent class.
+class Person():
+    #Use contrcutor to set attributes.
+    def __init__ (self, firstName, lastName, dateOfBirth):
+        #I am setting all attributes as private for secuirty reasons.
+        #This is indicated by "__"
+        self.__firstName = firstName
+        self.__lastName = lastName
+        self.__dateOfBirth = dateOfBirth
+
+    #Next we define the setter and getter functions for all attributes.
+    def getFirstName (self):
+        return self.__firstName
+    def setFirstName (self, firstName):
+        self.__firstName = firstName
+
+    def getLastName (self):
+        return self.__lastName
+    def setLastName (self, lastName):
+        self.__lastName = lastName
+
+    def getDateOfBirth (self):
+        return self.__dateOfBirth
+    def setDateOfBirth (self, dateOfBirth):
+        self.__dateOfBirth = dateOfBirth
+
+    #This method displays a person's information.
+    #Using f before quoation and using {} allows us to call attributes within strings.
+    def displayPerson (self):
+        print (f"First name: {self.__firstName}")
+        print (f"Last name: {self.__lastName}")
+        print (f"Date Of Birth: {self.__dateOfBirth}")
+
+    #So the object is callable as a string.
+    def __str__(self):
+        return f"{self.getFirstName()} {self.__lastName}"
+
+
+
+#Since a passenger is a person, we have person as the parent class.
+class Passenger (Person):
+    def __init__(self, firstName, lastName, dateOfBirth, money, passengerEmail, passengerPhone, passengerAccount, passGenSys):
+        #Since this new constructo overrides the parent's construtor, we have to use super() to set said attributes.
+        #You can also use Person.__init__(self, firstName, lastName, dateOfBirth) for spesific parent calsses.
+        super().__init__ (firstName, lastName, dateOfBirth)
+        #Here we set the remaining attributes.
+        self.__money = money
+        self.__passengerTickets = []
+        self.__passengerPasses = []
+        self.__passengerEmail = passengerEmail
+        self.__passengerPhone = passengerPhone
+        self.__passengerAccount = passengerAccount
+        #This is to add the passenger into the system.
+        passGenSys.addPassenger (self)
+        #I added this extra attribute so we can easily call respective airline objects.
+        self.__airline = passGenSys
+
+    #Defining setter and getter functions here.
+    def getMoney (self):
+        return self.__money
+    def setMoney (self, money):
+        self.__money = money
+
+    #These make sure to add or remove tickets.
+    def getTickets (self):
+        return self.__passengerTickets
+    def removeTicket (self, ticket):
+        if ticket in self.__passengerTickets:
+            self.__passengerTickets.remove(ticket)
+    def addTicket (self, ticket):
+        if ticket not in self.__passengerTickets:
+            self.__passengerTickets.append(ticket)
+
+    def getPassengerPasses (self):
+        return self.__passengerPasses
+    def removePass (self, Pass):
+        if Pass in self.__passengerPasses:
+            self.__passengerPasses.remove(Pass)
+    def addPass (self, Pass):
+        if Pass not in self.__passengerPasses:
+            self.__passengerPasses.append (Pass)
+
+    def getPassengerEmail (self):
+        return self.__passengerEmail
+    def setPassengerEmail (self, passengerEmail):
+        self.__passengerEmail = passengerEmail
+
+    def getPassengerPhone (self):
+        return self.__passengerPhone
+    def setPassengerPhone (self, passengerPhone):
+        self.__passengerPhone = passengerPhone
+
+    def getPassengerAccount (self):
+        return self.__passengerAccount
+    def setPassengerAccount (self, passengerAccount):
+        self.__passengerAccount = passengerAccount
+
+    def getAirline (self):
+        return self.__airline
+    def setAirline (self, passGenSys):
+        self.__airline = passGenSys
+
+    #Here we display passenger details.
+    def displayPassenger (self):
+        self.displayPerson()
+        print (f"Email: {self.__passengerEmail}")
+        print (f"Phone: {self.__passengerPhone}")
+        print (f"Account: {self.__passengerAccount}")
+        print (f"Money: {self.__money}")
+        #This prints every passenger ticket the next one is for passes.
+        for ticket in range (len(self.__passengerTickets)):
+            print (f"Ticket {ticket}: {self.__passengerTickets [ticket]}")
+        for Pass in range(len(self.__passengerPasses)):
+            print(f"Board Pass {Pass}: {self.__passengerPasses[Pass]}")
+
+    #This books a flight and adds a ticket to the passenger's list.
+    def bookFlight(self, flightNum, flight, seat, seatClass, barCode):
+        #Allows user to book flights.
+        pass
+
+    #This is for getting/creating a board pass.
+    def getBoardPass (self, ticket, boardPass):
+        self.__airline.generateBoardPass (self, ticket)
+        return True
+
+    #This lets the passenger board their flight.
+    def boardFlight (self, flight, boardPass, ticket):
+        #This checks if the board pass is valid then lets the passenger boards the flight.
+        #It also checks if this is the intended flight or not.
+        if self.__airline.verifyFlight (flight) == True:
+            if self.__airline.verifyTicket (ticket) == True:
+                if self.__airline.verifyPass (ticket, boardPass):
+                    #Pasenger boards the plane.
+                    return True
+
+        return False
+
+    #This is here so we can print the object as a string.
+    def __str__(self):
+        return f"{self.getFirstName()} {self.getFirstName()}"
+
+
+
+#This defines the airline staff.
+class AirlineStaff (Person):
+    def __init__ (self, firstName, lastName, dateOfBirth, salary, staffID, position, staffEmail, staffShift, passGenSys):
+        #Since this new constructo overrides the parent's construtor, we have to use super() to set said attributes.
+        #You can also use Person.__init__(self, firstName, lastName, dateOfBirth) for spesific parent calsses.
+        super().__init__ (firstName, lastName, dateOfBirth)
+        self.__salary = salary
+        self.__staffID = staffID
+        self.__position = position
+        self.__staffEmail = staffEmail
+        self.__staffShift = staffShift
+        passGenSys.addStaff(self)
+
+    #This is all the setter and getter functions.
+    def getSalary (self):
+        return self.__salary
+    def setSalary (self, salary):
+        self.__salary = salary
+
+    def getStaffID (self):
+        return self.__staffID
+    def setStaffID (self, staffID):
+        self.__staffID = staffID
+
+    def getPosition (self):
+        return self.__position
+    def setPosition (self, position):
+        self.__position = position
+
+    def getStaffEmail (self):
+        return self.__staffEmail
+    def setStaffEmail (self, staffEmail):
+        self.__staffEmail = staffEmail
+
+    def getStaffShift (self):
+        return self.__staffShift
+    def setStaffShift (self, staffShift):
+        self.__staffShift = staffShift
+
+    #This is for troubleshooting.
+    def troubleShootSystem (self, passGenSys):
+        #This troubleshoots the system and returns it online.
+        pass
+
+    #This gives us the staff's details.
+    def displayStaff (self):
+        self.displayPerson()
+        print (f"Staff ID: {self.__staffID}")
+        print (f"Staff Position: {self.__position}")
+        print (f"Staff Email: {self.__staffEmail}")
+        print (f"Staff Shift: {self.__staffShift}")
+        print (f"Salary: {self.__salary}")
+
+    #To call the object as a string.
+    def __str__(self):
+        return f"{self.getFirstName()} {self.getLastName()}"
+
+
+#Next we will create the flight class.
+class Flight:
+    def __init__ (self, flightNum, flightDestination, flightLocation, terminal, gate, arrivalTime, departureTime, boardingTill, passGenSys):
+        self.__flightNum = flightNum
+        self.__flightDestination = flightDestination
+        self.__flightLocation = flightLocation
+        self.__terminal = terminal
+        self.__gate = gate
+        self.__arrivalTime = arrivalTime
+        self.__departureTime = departureTime
+        self.__boardingTill = boardingTill
+        self.__passengers = []
+        passGenSys.addFlight (self)
+
+    #Here we define the getter and setter function.
+    def getFlightNum (self):
+        return self.__flightNum
+    def setFlighNum (self, flightNum):
+        self.__flightNum = flightNum
+
+    def getFlightDes (self):
+        return self.__flightDestination
+    def setFlightDes (self, flightDestination):
+        self.__flightDestination = flightDestination
+
+    def getFlightLoc (self):
+        return self.__flightLocation
+    def setFlightLoc (self, flightLocation):
+        self.__flightLocation = flightLocation
+
+    def getTerminal (self):
+        return self.__terminal
+    def setTerminal (self, terminal):
+        self.__terminal = terminal
+
+    def getGate (self):
+        return self.__gate
+    def setGate (self, gate):
+        self.__gate = gate
+
+    def getArrivalTime (self):
+        return self.__arrivalTime
+    def setArrivalTime (self, arrivalTime):
+        self.__arrivalTime = arrivalTime
+
+    def getDepartureTime (self):
+        return self.__departureTime
+    def setDepartureTime (self, departureTime):
+        self.__departureTime = departureTime
+
+    def getBoardingTill (self):
+        return self.__boardingTill
+    def setBoardingTill (self, boardingTill):
+        self.__boardingTill = boardingTill
+
+
+    #These add/remove passengers from the flight.
+    def getPassengers (self):
+        return self.__passengers
+    def removePassenger (self, passenger):
+        if passenger in self.__passengers:
+            self.__passengers.remove(passenger)
+            return True
+
+        return False
+    def addPassenger (self, passenger):
+        if passenger not in self.__passengers:
+            self.__passengers.append(passenger)
+            return True
+        return False
+
+    #This is for displaying flight information.
+    def displayFlight (self):
+        print (f"Flight number: {self.__flightNum}")
+        print (f"Flight destination: {self.__flightDestination}")
+        print (f"Flight location (from): {self.__flightLocation}")
+        print (f"Termial: {self.__terminal}")
+        print (f"Gate: {self.__gate}")
+        print (f"Arrival time: {self.__arrivalTime}")
+        print (f"Departure time: {self.__departureTime}")
+        print (f"Boarding till: {self.__boardingTill}")
+        #This loop goes through every passenger and prints them.
+        for passenger in range(len(self.getPassengers())):
+            print (f"Passenger {passenger}: {self.__passengers[passenger].getFirstName()} {self.__passengers[passenger].getLastName()}")
+
+    #So we can call the object as a string.
+    def __str__ (self):
+        return f"{self.getFlightNum()}"
+
+
+#Here we define tickets.
+class Ticket:
+    #For the sake of simplicity we will simulate the barcode/seat as a string.
+    def __init__ (self, ticketNum, TicketOwner, flight, seat, seatClass, barCode, passGenSys):
+        self.__ticketNum = ticketNum
+        self.__flightNum = flight.getFlightNum()
+        self.__arrivalTime = flight.getArrivalTime()
+        self.__departureTime = flight.getDepartureTime()
+        self.__ticketOwner = TicketOwner
+        self.__flightDestination = flight.getFlightDes()
+        self.__currentLocation = flight.getFlightLoc()
+        self.__terminal = flight.getTerminal()
+        self.__gate = flight.getGate()
+        self.__boardingTill = flight.getBoardingTill()
+        self.__seat = seat
+        self.__class = seatClass
+        self.__barCode = barCode
+        flight.addPassenger(self.__ticketOwner)
+        passGenSys.addTicket(self)
+
+    #Here we define the setter and getter functions.
+    def getTicketNum (self):
+        return self.__ticketNum
+    def setTicketNum (self, ticketNum):
+        self.__ticketNum = ticketNum
+
+    def getFlightNum (self):
+        return self.__flightNum
+    def setFlightNum (self, flightNum):
+        self.__flightNum = flightNum
+
+    def getFlightDes (self):
+        return self.__flightDestination
+    def setFlightDes (self, flightDestination):
+        self.__flightDestination = flightDestination
+
+    def getFlightLoc (self):
+        return self.__currentLocation
+    def setFlightLoc (self, flightLocation):
+        self.__flightLocation = flightLocation
+
+    def getTerminal (self):
+        return self.__terminal
+    def setTerminal (self, terminal):
+        self.__terminal = terminal
+
+    def getGate (self):
+        return self.__gate
+    def setGate (self, gate):
+        self.__gate = gate
+
+    def getArrivalTime (self):
+        return self.__arrivalTime
+    def setArrivalTime (self, arrivalTime):
+        self.__arrivalTime = arrivalTime
+
+    def getDepartureTime (self):
+        return self.__departureTime
+    def setDepartureTime (self, departureTime):
+        self.__departureTime = departureTime
+
+    def getOwner (self):
+        return self.__ticketOwner
+    def setOwner (self, owner):
+        self.__ticketOwner = owner
+
+    def getBoardingTill (self):
+        return self.__boardingTill
+    def setBoardingTill (self, boardingTill):
+        self.__boardingTill = boardingTill
+
+    def getSeat (self):
+        return self.__seat
+    def setSeat (self, seat):
+        self.__seat = seat
+
+    def getClass (self):
+        return self.__class
+    def setClass (self, seatClass):
+        self.__class = seatClass
+
+    def getBarCode (self):
+        return self.__barCode
+    def setBarCode (self, barCode):
+        self.__barCode = barCode
+
+    #Here we display the ticket.
+    def displayTicket(self):
+        print (f"Ticket number: {self.__ticketNum}")
+        print (f"Ticket owner: {self.__ticketOwner.getFirstName()} {self.__ticketOwner.getLastName()}")
+        print (f"Seat: {self.__seat}")
+        print (f"Class: {self.__class}")
+        print (f"Barcode: {self.__barCode}")
+        print(f"Flight number: {self.__flightNum}")
+        print(f"Flight destination: {self.__flightDestination}")
+        print(f"Flight location (from): {self.__flightLocation}")
+        print(f"Terminal: {self.__terminal}")
+        print(f"Gate: {self.__gate}")
+        print(f"Arrival time: {self.__arrivalTime}")
+        print(f"Departure time: {self.__departureTime}")
+        print(f"Boarding till: {self.__boardingTill}")
+
+    #So the object is callable as a string.
+    def __str__(self):
+        return f"{self.getTicketNum()}"
+
+
+
+#Here we define the boarding pass as its own class.
+class BoardingPass:
+    #The reason this class is almost identical to the ticket is because passes can be forged.
+    #Tickets can't be forged so it will be used to verify the pass.
+    def __init__ (self, ticket):
+        self.__ticketNum = ticket.getTicketNum()
+        self.__flightNum = ticket.getFlightNum()
+        self.__arrivalTime = ticket.getArrivalTime()
+        self.__departureTime = ticket.getDepartureTime()
+        self.__passOwner = ticket.getOwner()
+        self.__flightDestination = ticket.getFlightDes()
+        self.__currentLocation = ticket.getFlightLoc()
+        self.__terminal = ticket.getTerminal()
+        self.__gate = ticket.getGate()
+        self.__boardingTill = ticket.getBoardingTill()
+        self.__seat = ticket.getSeat()
+        self.__class = ticket.getClass()
+        self.__barCode = ticket.getBarCode()
+
+    #Here we define setter and getter.
+    def getTicketNum (self):
+        return self.__ticketNum
+    def setTicketNum (self, ticketNum):
+        self.__ticketNum = ticketNum
+
+    def getFlightNum (self):
+        return self.__flightNum
+    def setFlightNum (self, flightNum):
+        self.__flightNum = flightNum
+
+    def getFlightDes (self):
+        return self.__flightDestination
+    def setFlightDes (self, flightDestination):
+        self.__flightDestination = flightDestination
+
+    def setFlightLoc (self):
+        return self.__flightLocation
+    def getFlightLoc (self, flightLocation):
+        self.__flightLocation = flightLocation
+
+    def getTerminal (self):
+        return self.__terminal
+    def setTerminal (self, terminal):
+        self.__terminal = terminal
+
+    def getGate (self):
+        return self.__gate
+    def setGate (self, gate):
+        self.__gate = gate
+
+    def getArrivalTime (self):
+        return self.__arrivalTime
+    def setArrivalTime (self, arrivalTime):
+        self.__arrivalTime = arrivalTime
+
+    def getDepartureTime (self):
+        return self.__departureTime
+    def setDepartureTime (self, departureTime):
+        self.__departureTime = departureTime
+
+    def getOwner (self):
+        return self.__passOwner
+    def setOwner (self, owner):
+        self.__passOwner = owner
+
+    def getBoardingTill (self):
+        return self.__boardingTill
+    def setBoardingTill (self, boardingTill):
+        self.__boardingTill = boardingTill
+
+    def getSeat (self):
+        return self.__seat
+    def setSeat (self, seat):
+        self.__seat = seat
+
+    def getClass (self):
+        return self.__class
+    def setClass (self, seatClass):
+        self.__class = seatClass
+
+    def getBarCode (self):
+        return self.__barCode
+    def setBarCode (self, barCode):
+        self.__barCode = barCode
+
+    #This displays pass.
+    def displayPass(self):
+        print (f"Ticket number: {self.__ticketNum}")
+        print (f"Pass owner: {self.__passOwner.getFirstName()} {self.__passOwner.getLastName()}")
+        print (f"Seat: {self.__seat}")
+        print (f"Class: {self.__class}")
+        print (f"Barcode: {self.__barCode}")
+        print(f"Flight number: {self.__flightNum}")
+        print(f"Flight destination: {self.__flightDestination}")
+        print(f"Flight location (from): {self.__flightLocation}")
+        print(f"Terminal: {self.__terminal}")
+        print(f"Gate: {self.__gate}")
+        print(f"Arrival time: {self.__arrivalTime}")
+        print(f"Departure time: {self.__departureTime}")
+        print(f"Boarding till: {self.__boardingTill}")
+
+
+
+
+#Here we define the pass generation system class.
+class PassGenerationSystem:
+    def __init__(self, airline):
+        self.__airline = airline
+        self.__tickets = []
+        self.__flights = []
+        self.__passengers = []
+        self.__staffs = []
+        self.__ITdepartment = []
+        self.__xDepartment = []
+
+    #Here is setter and getter functions.
+    def getAirline (self):
+        return self.__airline
+    def setAirline (self, airline):
+        self.__airline = airline
+
+    def getTickets (self):
+        return self.__tickets
+    def addTicket (self, ticket):
+        if ticket not in self.__tickets:
+            self.__tickets.append(ticket)
+            return True
+        return False
+    def removeTicket (self, ticket):
+        if ticket in self.__tickets:
+            self.__tickets.remove (ticket)
+            return True
+        return False
+
+    def getFlights (self):
+        return self.__flights
+    def addFlight (self, flight):
+        if flight not in self.__flights:
+            self.__flights.append(flight)
+            return True
+        return False
+    def removeFlight (self, flight):
+        if flight in self.__flights:
+            self.__flights.remove(flight)
+            return True
+        return False
+
+    def getPassenger (self):
+        return self.__passengers
+    def addPassenger (self, passenger):
+        if passenger not in self.__passengers:
+            self.__passengers.append(passenger)
+            return True
+        return False
+    def removePassenger (self, passenger):
+        if passenger in self.__passengers:
+            self.__passengers.remove(passenger)
+            return True
+        return False
+
+    def getStaffs (self):
+        return self.__staffs
+    def addStaff (self, staff):
+        if staff not in self.__staffs:
+            self.__staffs.append(staff)
+            return True
+        return False
+    def removeStaff (self, staff):
+        if staff in self.__staffs:
+            self.__staffs.remove(staff)
+            return True
+        return False
+
+    #For the departments, we can check if the staff member belongs there first.
+    #Here would allow to remove or add staff to other departments regardless of position.
+    def getITdepartment (self):
+        return self.__ITdepartment
+    def addITdepartment (self, staff):
+        if staff not in self.__ITdepartment:
+            self.__ITdepartment.append(staff)
+            return True
+        return False
+    def removeITdepartment (self, staff):
+        if staff in self.__ITdepartment:
+            self.__ITdepartment.append(staff)
+            return True
+        return False
+
+    def getxDepartment (self):
+        return self.__xDepartment
+    def addxDepartment (self, staff):
+        if staff not in self.__xDepartment:
+            self.__xDepartment.append(staff)
+            return True
+        return False
+    def removexDepartment (self, staff):
+        if staff in self.__xDepartment:
+            self.__xDepartment.remove(staff)
+            return True
+        return False
+
+    #Here we verify a given ticket.
+    #True will be given when the ticket was varified.
+    def verifyTicket (self, ticket):
+        if ticket in self.__tickets:
+            return True
+        return False
+
+    #Here we verify a given pass using a ticket.
+    def verifyPass(self, ticket, boardPass):
+        if ticket is not None and boardPass is not None:
+            if ticket.getBarCode() == boardPass.getBarCode():
+                return True
+        return False
+
+    #Here wer verify the passenger.
+    def verifyPassenger (self, passenger):
+        if passenger in self.__passengers:
+            return True
+        return False
+
+    #Here we verify the flight.
+    def verifyFlight (self, flight):
+        if flight in self.__flights:
+            return True
+        return False
+
+    #This creates the boarding pass for the passengers.
+    def generateBoardPass(self, passenger, ticket):
+        if self.verifyPassenger(passenger) and self.verifyTicket(ticket):
+            boardingPass = BoardingPass(ticket)
+            passenger.addPass(boardingPass)
+            return boardingPass
+        return None
+
+    #I added this so we can see the system's details.
+    def displaySystem (self):
+        print (f"Airline: {self.__airline}")
+        print (f"Tickets: {self.__tickets}")
+        print (f"Flights: {self.__flights}")
+        print (f"Passengers: {self.__passengers}")
+        print (f"Staffs: {self.__staffs}")
+        print (f"IT department: {self.__ITdepartment}")
+        print (f"X department: {self.__xDepartment}")
+
+#Here are some test-cases:
+person1 = Person ("Abdulla", "Ahmad", datetime.datetime (2005, 8, 2))
+#We expect this to display the first name (Ahmad), last name (Ahmad), then date of birth (2004/12/26).
+person1.displayPerson()
+
+#Lets create a airline or a pass generation system.
+#Lets call it "Fly-Away".
+system1 = PassGenerationSystem ("Fly-away")
+
+#Lets try creating passenger1 and add it to "Fly-away".
+passenger1 = Passenger("Ahmad", "Ahmad", datetime.datetime(2004, 12, 26),
+                       30034.1, "Something123@gmail.com", "0501234567",
+                       "Account X", system1)
+
+print ("")
+print ("Lets try displaying the info.")
+passenger1.displayPassenger()
+
+print ("")
+print ("Lets check the system.")
+#We expect to see a passenger in the system.
+system1.displaySystem()
+
+print ("")
+#Lets create a flight, display it, and book it for Passenger 1.
+# When creating a Flight object, ensure you provide the required parameters.
+# For example:
+flight1 = Flight("341", Location.Baku, Location.Dubai, 2, 1,
+                 datetime.datetime(2023, 1, 1, 13, 30),
+                 datetime.datetime(2023, 1, 1, 10, 30),
+                 datetime.datetime(2023, 1, 1, 10, 20),
+                 system1)
+flight1.displayFlight()
+
+print ("")
+#Lets book passenger1
+ticket1 = Ticket("123456", passenger1, flight1, "02A", SeatClass.Business, "we<5f#fj2/sa+", system1)
+print ("Lets check if the ticket is in the system and is in the user's hands: ")
+print ("")
+print ("System: ")
+system1.displaySystem()
+print ("")
+print ("Passenger: ")
+passenger1.displayPassenger()
+print ("")
+print ("To show that the passenger is registered in the flight: ")
+flight1.displayFlight()
+
+
+
+#Lets try generating a boarding pass.
+print ("")
+print ("Creating Boarding Pass:.....")
+boardPass1 = BoardingPass (ticket1)
+passenger1.getBoardPass(ticket1, boardPass1)
+print ("Check Pass Validity:", system1.verifyPass (ticket1, boardPass1))
+
+#Try forging the board pass.
+print ("")
+print ("We will use setter function to forge the bar code: ")
+boardPass1.setBarCode("ForGeDpAsS")
+print ("Check Pass Validity:", system1.verifyPass (ticket1, boardPass1))
+
+#Lets try and board our flight.
+#We will bring back the orignal pass.
+print ("")
+print ("We will board our flight (using orignal pass): ")
+boardPass1.setBarCode("we<5f#fj2/sa+")
+#passenger1 could have multiple flights, board passes, or tickets, so we need to sepcify used ticket/pass and flight.
+print ("Boarding flight: ", passenger1.boardFlight (flight1, boardPass1, ticket1))
+
+
+print ("This showcases that our main function of the system works as intened.")
